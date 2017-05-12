@@ -1,5 +1,8 @@
 const http = require('http');
-const fs = require('fs');
+
+function wait (time) {
+  return new Promise (resolve => setTimeout(resolve, time));
+}
 
 class Endpoint {
   constructor (options) {
@@ -28,17 +31,21 @@ class Endpoint {
     return url;
   }
   endOfQuery () {
-    if (this.queryQueue.length > 0) {
-      if (this.queryThrottle) {
-        // wait a bit before running subsequent queries
-        wait(this.queryThrottle).then(() => {
+    if (this.queryThrottle) {
+      // wait a bit before running subsequent queries
+      console.log('waiting....');
+      wait(this.queryThrottle).then(() => {
+        console.log('going....');
+        this.running = false;
+        if (this.queryQueue.length > 0) {
           this.processQuery(...this.queryQueue.shift());
-        });
-      } else {
-        this.processQuery(...this.queryQueue.shift());
-      }
+        }
+      });
     } else {
       this.running = false;
+      if (this.queryQueue.length > 0) {
+        this.processQuery(...this.queryQueue.shift());
+      }
     }
   }
   processQuery (query, resolve, reject) {
@@ -82,7 +89,7 @@ class Endpoint {
   }
   runQuery (query) {
     return new Promise((resolve, reject) => {
-      processQuery(query, resolve, reject);
+      this.processQuery(query, resolve, reject);
     });
   }
 }
@@ -108,11 +115,9 @@ const prefixes = {
 };
 
 class Query {
-  constructor (queryString, prefixes, groupBy, collectFields) {
+  constructor (queryString, prefixes) {
     this.queryString = queryString;
     this.prefixes = prefixes;
-    this.groupBy = groupBy;
-    this.collectFields = new Set(collectFields);
   }
   makePrefixes () {
     return this.prefixes.map(prefix => {
@@ -122,7 +127,7 @@ class Query {
           uri: prefixes[prefix]
         };
       }
-      return `PREFIX ${prefix.name}: ${prefix.uri}`
+      return `PREFIX ${prefix.name}: ${prefix.uri}`;
     }).join('\n');
   }
   toString () {

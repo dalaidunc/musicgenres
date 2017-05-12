@@ -1,9 +1,10 @@
 {
-  "name": "musicgenres",
+  "name": "musicgenres-pipeline",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint **/*.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,5 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.5.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0"
   }
 }

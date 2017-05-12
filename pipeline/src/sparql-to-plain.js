@@ -5,6 +5,7 @@
  * @collectFields - Any fields by which to group (set as an array)
  */
 function parse (json, groupKey, collectFields) {
+  collectFields = new Set(collectFields);
   const dict = {};
   json.results.bindings.forEach(binding => {
     const key = binding[groupKey].value;
