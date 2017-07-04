@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const plainParse = require('../src/sparql-to-plain.js');
+const d3Parse = require('../src/plain-to-d3.js');
 const sparql = require('../src/sparql.js');
 
 const endpoint = new sparql.Endpoint({
@@ -65,7 +66,9 @@ function getGenres () {
         });
       });
       return fs.writeFileAsync('music-genres.json', JSON.stringify(json, null, 2), 'utf8').then(() => {
-        return json;
+        return fs.writeFileAsync('music-genres-d3.json', JSON.stringify(d3Parse(json), null, 2), 'utf8').then(() => {
+          return json;
+        });
       });
     }).catch(e => {
       console.log('error', e);
