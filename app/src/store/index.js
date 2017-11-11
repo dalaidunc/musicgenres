@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { updateData, setup, hideSingletons, runLayout, loadData } from '../d3chart.js';
+import { loadData, restart, setup } from '../d3chart.js';
 
 Vue.use(Vuex);
 
@@ -37,10 +37,7 @@ export default new Vuex.Store({
           commit('setNodes', json.nodes);
           commit('setLinks', json.links);
           commit('setDataView', json);
-          // todo consider putting these side-effects in an action
-          // (and don't call this mutation directly - except through action)
           loadData(json);
-          runLayout(state.currentLayout);
           return json;
         });
       });
@@ -51,18 +48,16 @@ export default new Vuex.Store({
         memo.add(link.target.id);
         return memo;
       }, new Set());
-      const newNodes = state.nodes.filter(node => validNodeIds.has(node.id));
-      commit('setDataView', {nodes: newNodes, links: state.links});
-      // todo consider putting these side-effects in an action
-      // (and don't call this mutation directly - except through action)
-      console.log(state.dataView);
-      loadData(state.dataView);
-      runLayout(state.currentLayout);
+      const nodes = state.nodes.filter(node => validNodeIds.has(node.id));
+      restart({nodes, links: state.links});
+      commit('setDataView', {nodes, links: state.links});
     },
-    setupChart ({commit}, elemId) {
-      const svg = setup(elemId);
+    clickedNode ({commit}, node) {
+      // TODO: update things with clicked node details
+    },
+    setupChart ({commit, dispatch}, elemId) {
+      const svg = setup(elemId, dispatch);
       commit('setChart', svg);
-    },
-    runLayout: (state, type) => runLayout(type)
+    }
   }
 });

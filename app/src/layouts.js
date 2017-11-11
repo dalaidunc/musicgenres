@@ -2,14 +2,13 @@ import * as d3 from 'd3';
 
 let sim = null;
 
-export function restart (nodes, links, tickFn, centre) {
+export function restart (nodes, links) {
   sim.nodes(nodes);
   sim.force('link').links(links);
   sim.alpha(1).restart();
-  // sim.restart();
 }
 
-export function standard (nodes, links, tickFn, centre) {
+export function setupLayout (tickFn, centre) {
   console.log('standard layout', arguments);
   sim = d3.forceSimulation(nodes)
     .force('charge', d3.forceManyBody())
@@ -17,10 +16,7 @@ export function standard (nodes, links, tickFn, centre) {
     .force('collision', d3.forceCollide(20))
     .force('center', d3.forceCenter(centre.x, centre.y));
 
-  sim.nodes(nodes).on('tick', tickFn);
-
-  sim.force('link').links(links);
-
+  sim.on('tick', tickFn);
 
 }
 
