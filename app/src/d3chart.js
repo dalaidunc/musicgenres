@@ -4,12 +4,23 @@ var svg, width, height, g, link, node, dragCircle, dispatch;
 
 const zoom = d3.zoom().scaleExtent([0.1, 7]);
 
+// attempt #1 at zoom to fit
+// setTimeout(function () {
+//   console.log(g.node().getBBox());
+//   const bbox = g.node().getBBox();
+//   var scale = 0.85 / Math.max(bbox.width / width, bbox.height / height);
+//   console.log(scale);
+//   console.log(zoom);
+//   zoom.scaleTo(g, scale);
+// }, 1000);
+
 const nodeSize = 18;
 
 var simulation, data;
 
-zoom.on('zoom', () => {
+zoom.on('zoom', (...args) => {
   let { transform } = d3.event;
+  const current = d3.zoomTransform(g.node());
   g.attr('transform', transform);
 });
 
@@ -110,6 +121,13 @@ export function setup(id, boundDispatch) {
     d.fx = null;
     d.fy = null;
   }
+}
+
+export function zoomToNode (node) {
+  const transform = d3.zoomIdentity
+    .scale(1)
+    .translate(width / 2 - node.x, height / 2 - node.y);
+  svg.transition().duration(600).call(zoom.transform, transform, node);
 }
 
 export function restart({ nodes, links }) {

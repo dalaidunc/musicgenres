@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { loadData, restart, setup } from '../d3chart.js';
+import { loadData, restart, setup, zoomToNode } from '../d3chart.js';
 
 Vue.use(Vuex);
 
@@ -41,6 +41,9 @@ export default new Vuex.Store({
           return json;
         });
       });
+    },
+    zoomToNode ({state}, node) {
+      zoomToNode(node);
     },
     hideSingletons ({commit, state}) {
       const validNodeIds = state.links.reduce((memo, link) => {
