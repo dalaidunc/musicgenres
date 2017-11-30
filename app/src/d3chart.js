@@ -4,19 +4,20 @@ var svg, width, height, g, link, node, dragCircle, dispatch;
 
 const zoom = d3.zoom().scaleExtent([0.1, 7]);
 
-// attempt #1 at zoom to fit
-// setTimeout(function () {
-//   console.log(g.node().getBBox());
-//   const bbox = g.node().getBBox();
-//   var scale = 0.85 / Math.max(bbox.width / width, bbox.height / height);
-//   console.log(scale);
-//   console.log(zoom);
-//   zoom.scaleTo(g, scale);
-// }, 1000);
-
 const nodeSize = 18;
 
 var simulation, data;
+
+// attempt #1 at zoom to fit
+// TODO: a bit hacky, but the visual effect is not bad
+setTimeout(function () {
+  const bbox = g.node().getBBox();
+  const scale = 0.85 / Math.max(bbox.width / width, bbox.height / height);
+  const transform = d3.zoomIdentity
+    .scale(scale)
+    .translate(bbox.width, bbox.height / 2);
+  svg.transition().duration(800).call(zoom.transform, transform);
+}, 1000);
 
 zoom.on('zoom', (...args) => {
   let { transform } = d3.event;
