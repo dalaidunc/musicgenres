@@ -29,6 +29,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100vh;
+  background: rgb(225, 225, 210);
   margin: 0;
   padding: 0;
   right: 0;
@@ -41,7 +42,7 @@ export default {
   stroke-width: 2px;
 }
 .node circle {
-  fill: rgba(0, 100, 150, 0.8);
+  /* fill: rgba(0, 100, 150, 0.8); */
   stroke: #002299;
 }
 .node-label {

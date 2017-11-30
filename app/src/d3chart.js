@@ -40,6 +40,7 @@ function setupLayout({ nodes, links }) {
 function drawNode(nodeEnter) {
   const circle = nodeEnter
     .append("circle")
+    .attr('fill', d => d.colour || 'rgb(200, 0, 300)')
     .attr("r", nodeSize)
     .call(dragCircle)
   const nodeLabels = nodeEnter
@@ -127,11 +128,33 @@ export function setup(id, boundDispatch) {
   }
 }
 
-export function zoomToNode (node) {
+// TODO: perhaps this should be in the Vue store instead
+function getNeighbours (node) {
+  const selection = [node];
+  d3.selectAll('.link').each(link => {
+    if (link.source.id === node.id) {
+      selection.push(link.target);
+    } else if (link.target.id === node.id) {
+      selection.push(link.source);
+    }
+  });
+  return selection;
+}
+
+function colourNodeAndNeighbours(node) {
+  const nodeIds = new Set(getNeighbours(node).map(n => n.id));
+  const selectionColour = 'rgb(200, 200, 200)';
+  d3.selectAll('.node').select('circle').attr('fill', d => {
+    return nodeIds.has(d.id) ? selectionColour : 'rgb(200, 0, 0)';
+  });
+}
+
+export function zoomToNode (node, duration = 600) {
+  colourNodeAndNeighbours(node);
   const transform = d3.zoomIdentity
     .scale(1)
     .translate(width / 2 - node.x, height / 2 - node.y);
-  svg.transition().duration(600).call(zoom.transform, transform, node);
+  svg.transition().duration(duration).call(zoom.transform, transform, node);
 }
 
 export function restart({ nodes, links }) {

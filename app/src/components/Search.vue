@@ -1,8 +1,8 @@
 <template>
   <div>
-    <form>
+    <form @submit.prevent='focus'>
       <input @input='doSearch' type='text' name='search' />
-      <button type='submit'>Search</button>
+      <button type='submit'>FOCUS</button>
     </form>
     <ul v-if='results.length'>
       <li @click="clickGenre(result)" :key="result.uri" v-for='result in results'>{{result.label}}</li>
@@ -11,31 +11,42 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters } from "vuex";
 
 export default {
-  name: 'search',
+  name: "search",
   data() {
     return {
+      selectedNode: null,
       results: [],
       maxResults: Infinity
     };
   },
   computed: {
-    ...mapGetters(['nodes'])
+    ...mapGetters(["nodes"])
   },
   methods: {
-    ...mapActions(['zoomToNode']),
-    clickGenre (node) {
-      console.log(node);
+    ...mapActions(["zoomToNode", "focusNode"]),
+    focus() {
+      if (this.selectedNode) {
+        this.focusNode(this.selectedNode);
+      }
+    },
+    clickGenre(node) {
+      this.selectedNode = node;
       this.zoomToNode(node);
     },
-    doSearch (e) {
+    doSearch(e) {
+      this.selectedNode = null;
       const val = e.target.value;
       if (val.length > 2) {
-        const regex = new RegExp(val, 'i');
+        const regex = new RegExp(val, "i");
         const tempResults = [];
-        for (let i = 0; i < this.nodes.length && tempResults.length < this.maxResults; i++) {
+        for (
+          let i = 0;
+          i < this.nodes.length && tempResults.length < this.maxResults;
+          i++
+        ) {
           const node = this.nodes[i];
           if (regex.test(node.label)) {
             tempResults.push(node);
@@ -47,7 +58,7 @@ export default {
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -60,7 +71,7 @@ button {
 input {
   border-radius: 3px;
   padding: 2px;
-  border: 1px solid #C0C0C0;
+  border: 1px solid #c0c0c0;
 }
 ul {
   max-height: 100px;
@@ -68,7 +79,7 @@ ul {
   display: inline-block;
   list-style-type: none;
   padding: 0;
-  background: #EFEFEF;
+  background: #efefef;
 }
 li {
   text-align: left;

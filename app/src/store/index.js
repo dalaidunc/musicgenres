@@ -4,6 +4,23 @@ import { loadData, restart, setup, zoomToNode } from '../d3chart.js';
 
 Vue.use(Vuex);
 
+function getNeighbours(node, links, direction) {
+  const neighbours = {
+    nodes: [node],
+    links: []
+  };
+  links.forEach(link => {
+    if (link.source.id === node.id && (!direction || direction === 'target')) {
+      neighbours.nodes.push(link.target);
+      neighbours.links.push(link);
+    } else if (link.target.id === node.id && (!direction || direction === 'source')) {
+      neighbours.nodes.push(link.source);
+      neighbours.links.push(link);
+    }
+  });
+  return neighbours;
+}
+
 export default new Vuex.Store({
   state: {
     nodes: null,
@@ -41,6 +58,13 @@ export default new Vuex.Store({
           return json;
         });
       });
+    },
+    focusNode ({state}, node) {
+      const neighbours = getNeighbours(node, state.links);
+      restart(neighbours);
+      // and centre the node onto screen
+      // TODO: how to work out when restart is finished?
+      setTimeout(() => zoomToNode(node, 0), 0);
     },
     zoomToNode ({state}, node) {
       zoomToNode(node);
