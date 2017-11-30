@@ -96,8 +96,11 @@ export function setup(id, boundDispatch) {
   const elem = document.getElementById(id);
   dispatch = boundDispatch;
   svg = d3.select(elem);
-  width = elem.clientWidth;
-  height = elem.clientHeight;
+  // this method of getting width/height seems to work on both chrome and FF
+  // unlike some other methods
+  const bounds = elem.getBoundingClientRect();
+  width = bounds.width;
+  height = bounds.height;
   g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
   link = g.append("g").attr("stroke", "#000").attr("stroke-width", 1.5).selectAll(".link");
   node = g.append("g").attr("stroke", "#fff").attr("stroke-width", 1.5).selectAll(".node");
