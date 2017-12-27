@@ -1,10 +1,11 @@
 <template>
   <div>
     <form @submit.prevent='focus'>
-      <input @input='doSearch' type='text' name='search' />
-      <button type='submit'>FOCUS</button>
+      <input :disabled='isFocused' @input='doSearch' v-model='selectedNodeName' type='text' name='search' autocomplete="off" />
+      <button type='submit'>Focus</button>
+      <button type='button' @click='reset'>Reset</button>
     </form>
-    <ul v-if='results.length'>
+    <ul v-if='results.length && !isFocused'>
       <li @click="clickGenre(result)" :key="result.uri" v-for='result in results'>{{result.label}}</li>
     </ul>
   </div>
@@ -17,6 +18,8 @@ export default {
   name: "search",
   data() {
     return {
+      isFocused: false,
+      selectedNodeName: '',
       selectedNode: null,
       results: [],
       maxResults: Infinity
@@ -26,13 +29,19 @@ export default {
     ...mapGetters(["nodes"])
   },
   methods: {
-    ...mapActions(["zoomToNode", "focusNode"]),
+    ...mapActions(["zoomToNode", "focusNode", "hideSingletons"]),
+    reset() {
+      this.isFocused = false;
+      this.hideSingletons();
+    },
     focus() {
+      this.isFocused = true;
       if (this.selectedNode) {
         this.focusNode(this.selectedNode);
       }
     },
     clickGenre(node) {
+      this.selectedNodeName = node.label;
       this.selectedNode = node;
       this.zoomToNode(node);
     },

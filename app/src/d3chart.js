@@ -8,6 +8,11 @@ const nodeSize = 18;
 
 var simulation, data;
 
+const colours = {
+  defaultNodeCircle: 'rgb(200, 0, 0)',
+  selectionNodeCircle: 'rgb(200, 0, 200)'
+};
+
 // attempt #1 at zoom to fit
 // TODO: a bit hacky, but the visual effect is not bad
 setTimeout(function () {
@@ -40,7 +45,7 @@ function setupLayout({ nodes, links }) {
 function drawNode(nodeEnter) {
   const circle = nodeEnter
     .append("circle")
-    .attr('fill', d => d.colour || 'rgb(200, 0, 300)')
+    .attr('fill', d => d.colour || colours.defaultNodeCircle)
     .attr("r", nodeSize)
     .call(dragCircle)
   const nodeLabels = nodeEnter
@@ -143,10 +148,13 @@ function getNeighbours (node) {
 
 function colourNodeAndNeighbours(node) {
   const nodeIds = new Set(getNeighbours(node).map(n => n.id));
-  const selectionColour = 'rgb(200, 200, 200)';
   d3.selectAll('.node').select('circle').attr('fill', d => {
-    return nodeIds.has(d.id) ? selectionColour : 'rgb(200, 0, 0)';
+    return nodeIds.has(d.id) ? colours.selectionNodeCircle : colours.defaultNodeCircle;
   });
+}
+
+function resetNodeColours(node) {
+  d3.selectAll('.node').select('circle').attr('fill', d => colours.defaultNodeCircle);
 }
 
 export function zoomToNode (node, duration = 600) {
@@ -163,6 +171,8 @@ export function restart({ nodes, links }) {
   node = node.data(nodes, function (d) { return d.id; });
   node.exit().remove();
   node = drawNode(node.enter().append('g').attr('class', 'node').on('click', clickedNode)).merge(node);
+
+  resetNodeColours();
 
   // Apply the general update pattern to the links.
   link = link.data(links, function (d) { return d.source.id + "-" + d.target.id; });
