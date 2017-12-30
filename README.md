@@ -8,3 +8,7 @@
 ### App
 
 * This is a simple D3 network visualisation of the music data. Created using Vue.js.
+
+![Music genres](/images/app.png)
+![Searching](/images/search.png)
+![Focus](/images/focus.png)
